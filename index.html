@@ -1,687 +1,887 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="万能鱼工具箱 - 免费在线工具集合，提供文本对比、JSON格式化、Base64编解码、二维码生成、密码生成等实用工具。简单好用，无需下载。">
-    <meta name="keywords" content="万能鱼,在线工具箱,文本对比,JSON格式化,Base64,二维码生成器,密码生成器,在线工具">
-    <title>万能鱼工具箱 - 免费在线工具集合 | wannengyu.com</title>
-    <style>
-        /* ===== CSS Variables & Reset ===== */
-        :root {
-            --primary: #0ea5e9;
-            --primary-dark: #0284c7;
-            --primary-light: #e0f2fe;
-            --accent: #f59e0b;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --text-secondary: #64748b;
-            --text-light: #94a3b8;
-            --border: #e2e8f0;
-            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-            --shadow-hover: 0 10px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04);
-            --radius: 16px;
-            --radius-sm: 10px;
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            --max-width: 1200px;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            min-height: 100vh;
-        }
-
-        a { text-decoration: none; color: inherit; }
-        img { max-width: 100%; }
-
-        /* ===== Header / Navigation ===== */
-        .header {
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(12px);
-            background: rgba(255,255,255,0.92);
-        }
-
-        .header-inner {
-            max-width: var(--max-width);
-            margin: 0 auto;
-            padding: 0 20px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .logo-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: white;
-        }
-
-        .logo span {
-            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-        }
-
-        .nav-links a {
-            font-size: 14px;
-            color: var(--text-secondary);
-            font-weight: 500;
-            transition: var(--transition);
-        }
-
-        .nav-links a:hover { color: var(--primary); }
-
-        .nav-links .github-link {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            font-size: 13px;
-            transition: var(--transition);
-        }
-
-        .nav-links .github-link:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text);
-            padding: 4px;
-        }
-
-        /* ===== Hero Section ===== */
-        .hero {
-            max-width: var(--max-width);
-            margin: 0 auto;
-            padding: 60px 20px 50px;
-            text-align: center;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 14px;
-            border-radius: 20px;
-            background: var(--primary-light);
-            color: var(--primary-dark);
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 20px;
-        }
-
-        .hero h1 {
-            font-size: 42px;
-            font-weight: 800;
-            line-height: 1.2;
-            margin-bottom: 16px;
-            letter-spacing: -0.02em;
-        }
-
-        .hero h1 span {
-            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero p {
-            font-size: 18px;
-            color: var(--text-secondary);
-            max-width: 560px;
-            margin: 0 auto 32px;
-        }
-
-        /* ===== Search Bar ===== */
-        .search-wrap {
-            max-width: 520px;
-            margin: 0 auto 8px;
-            position: relative;
-        }
-
-        .search-wrap input {
-            width: 100%;
-            padding: 14px 20px 14px 48px;
-            border: 2px solid var(--border);
-            border-radius: 50px;
-            font-size: 16px;
-            background: var(--card-bg);
-            transition: var(--transition);
-            outline: none;
-            color: var(--text);
-        }
-
-        .search-wrap input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(14,165,233,0.12);
-        }
-
-        .search-wrap input::placeholder { color: var(--text-light); }
-
-        .search-icon {
-            position: absolute;
-            left: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-light);
-            font-size: 18px;
-            pointer-events: none;
-        }
-
-        /* ===== Stats Bar ===== */
-        .stats-bar {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            padding: 24px 0;
-            max-width: var(--max-width);
-            margin: 0 auto;
-            border-top: 1px solid var(--border);
-            flex-wrap: wrap;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-item .num {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .stat-item .label {
-            font-size: 13px;
-            color: var(--text-light);
-            margin-top: 2px;
-        }
-
-        /* ===== Section Title ===== */
-        .section-title {
-            max-width: var(--max-width);
-            margin: 0 auto;
-            padding: 40px 20px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .section-title h2 {
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        .section-title h2 .emoji {
-            margin-right: 8px;
-        }
-
-        /* ===== Category Tabs ===== */
-        .category-tabs {
-            max-width: var(--max-width);
-            margin: 0 auto;
-            padding: 0 20px 8px;
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-
-        .category-tabs::-webkit-scrollbar { display: none; }
-
-        .category-tab {
-            flex-shrink: 0;
-            padding: 8px 18px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            background: var(--card-bg);
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition);
-            white-space: nowrap;
-        }
-
-        .category-tab:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .category-tab.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-
-        /* ===== Tools Grid ===== */
-        .tools-grid {
-            max-width: var(--max-width);
-            margin: 0 auto;
-            padding: 8px 20px 48px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 16px;
-        }
-
-        .tool-card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 24px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tool-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
-            opacity: 0;
-            transition: var(--transition);
-        }
-
-        .tool-card:hover {
-            border-color: transparent;
-            box-shadow: var(--shadow-hover);
-            transform: translateY(-3px);
-        }
-
-        .tool-card:hover::before { opacity: 1; }
-
-        .tool-card .icon-wrap {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            margin-bottom: 14px;
-        }
-
-        .tool-card .icon-wrap.blue { background: #e0f2fe; }
-        .tool-card .icon-wrap.green { background: #dcfce7; }
-        .tool-card .icon-wrap.yellow { background: #fef3c7; }
-        .tool-card .icon-wrap.purple { background: #f3e8ff; }
-        .tool-card .icon-wrap.red { background: #ffe4e6; }
-        .tool-card .icon-wrap.teal { background: #ccfbf1; }
-
-        .tool-card h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-
-        .tool-card p {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        .tool-card .hot-badge {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            padding: 2px 10px;
-            border-radius: 10px;
-            background: #fef3c7;
-            color: #d97706;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .tool-card .new-badge {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            padding: 2px 10px;
-            border-radius: 10px;
-            background: #dcfce7;
-            color: #16a34a;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        /* ===== Coming Soon ===== */
-        .coming-soon {
-            max-width: var(--max-width);
-            margin: 0 auto;
-            padding: 0 20px 48px;
-        }
-
-        .coming-soon-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
-        }
-
-        .coming-item {
-            padding: 16px 20px;
-            border: 1px dashed var(--border);
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text-light);
-            font-size: 14px;
-            transition: var(--transition);
-        }
-
-        .coming-item:hover {
-            border-color: var(--primary);
-            color: var(--text-secondary);
-        }
-
-        .coming-item .emoji { font-size: 18px; }
-
-        /* ===== Footer ===== */
-        .footer {
-            border-top: 1px solid var(--border);
-            padding: 40px 20px;
-            text-align: center;
-            background: var(--card-bg);
-        }
-
-        .footer-inner {
-            max-width: var(--max-width);
-            margin: 0 auto;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-
-        .footer-links a {
-            font-size: 14px;
-            color: var(--text-secondary);
-            transition: var(--transition);
-        }
-
-        .footer-links a:hover { color: var(--primary); }
-
-        .footer p {
-            font-size: 13px;
-            color: var(--text-light);
-        }
-
-        .footer .domain {
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        /* ===== Mobile Styles ===== */
-        @media (max-width: 768px) {
-            .header-inner { height: 56px; padding: 0 16px; }
-            .logo { font-size: 18px; }
-            .logo-icon { width: 30px; height: 30px; font-size: 16px; }
-
-            .nav-links { display: none; }
-            .mobile-menu-btn { display: block; }
-
-            .hero { padding: 40px 16px 32px; }
-            .hero h1 { font-size: 28px; }
-            .hero p { font-size: 15px; }
-
-            .stats-bar { gap: 24px; padding: 16px 0; }
-            .stat-item .num { font-size: 20px; }
-
-            .section-title { padding: 28px 16px 16px; }
-            .section-title h2 { font-size: 20px; }
-
-            .tools-grid {
-                grid-template-columns: 1fr;
-                padding: 8px 16px 32px;
-                gap: 12px;
-            }
-
-            .tool-card { padding: 18px; }
-            .tool-card .icon-wrap { width: 38px; height: 38px; font-size: 18px; }
-
-            .coming-soon-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .footer { padding: 28px 16px; }
-            .footer-links { gap: 16px; }
-        }
-
-        @media (max-width: 400px) {
-            .hero h1 { font-size: 24px; }
-            .coming-soon-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="万能鱼工具箱 - 永久免费的在线工具集合。文本对比、JSON格式化、Base64编解码、二维码生成、密码生成等开发与日常工具，无需注册，打开即用。">
+  <meta name="keywords" content="在线工具,万能鱼,文本对比,JSON格式化,Base64,二维码生成,密码生成,免费工具">
+  <meta name="author" content="万能鱼工具箱">
+  <title>万能鱼工具箱 - 免费在线工具大全</title>
+  <link rel="canonical" href="https://wannengyu.com/">
+  <style>
+    /* ========== Reset & Base ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+    img { max-width: 100%; display: block; }
+
+    /* ========== Container ========== */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ========== Header / Nav ========== */
+    .site-header {
+      background: #ffffff;
+      border-bottom: 1px solid #e9edf2;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.92);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    .nav-links a {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #475569;
+      transition: color 0.2s;
+      position: relative;
+    }
+    .nav-links a:hover { color: #3b82f6; }
+    .nav-links a.nav-gh {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    .nav-links a.nav-gh:hover {
+      border-color: #3b82f6;
+      background: #f0f7ff;
+    }
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .menu-toggle span {
+      display: block;
+      width: 26px;
+      height: 2.5px;
+      background: #334155;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+    .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .menu-toggle.active span:nth-child(2) { opacity: 0; }
+    .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+    /* ========== Hero ========== */
+    .hero {
+      text-align: center;
+      padding: 60px 0 48px;
+    }
+    .hero h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      margin-top: 14px;
+      font-size: 1.1rem;
+      color: #64748b;
+    }
+    .hero-badges {
+      margin-top: 18px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .hero-badges span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: #475569;
+      background: #f1f5f9;
+      padding: 6px 16px;
+      border-radius: 20px;
+    }
+
+    /* ========== Search ========== */
+    .search-wrap {
+      max-width: 540px;
+      margin: 32px auto 0;
+      position: relative;
+    }
+    .search-wrap input {
+      width: 100%;
+      height: 52px;
+      padding: 0 20px 0 48px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 1rem;
+      outline: none;
+      background: #fff;
+      transition: all 0.25s;
+      color: #1e293b;
+    }
+    .search-wrap input::placeholder { color: #94a3b8; }
+    .search-wrap input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+    .search-wrap .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+    .search-clear {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: 1.1rem;
+      color: #94a3b8;
+      cursor: pointer;
+      display: none;
+      padding: 4px;
+    }
+    .search-clear.show { display: block; }
+
+    /* ========== Stats Bar ========== */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      padding: 20px 0;
+      border-top: 1px solid #e9edf2;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-item .num {
+      display: block;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #3b82f6;
+    }
+    .stat-item .label {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* ========== Section ========== */
+    .section {
+      padding: 40px 0;
+    }
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+    .section-desc {
+      color: #64748b;
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+    }
+
+    /* ========== Category Tabs ========== */
+    .category-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .category-tab {
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+      background: #f1f5f9;
+      color: #475569;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .category-tab:hover { background: #e2e8f0; }
+    .category-tab.active {
+      background: #3b82f6;
+      color: #fff;
+      border-color: #3b82f6;
+    }
+
+    /* ========== Tool Grid ========== */
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .tool-card {
+      background: #fff;
+      border: 1px solid #e9edf2;
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .tool-card:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      transform: translateY(-2px);
+    }
+    .tool-card .icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 12px;
+    }
+    .tool-card h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+    .tool-card p {
+      font-size: 0.85rem;
+      color: #64748b;
+      line-height: 1.5;
+    }
+    .tool-card .tags {
+      margin-top: 12px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .tool-card .tags span {
+      font-size: 0.75rem;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+    .tag-hot { background: #fef2f2; color: #dc2626; }
+    .tag-new { background: #f0fdf4; color: #16a34a; }
+    .tag-free { background: #eff6ff; color: #2563eb; }
+
+    .tool-card .card-link {
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      z-index: 1;
+    }
+
+    /* ========== Hot Tools ========== */
+    .hot-section {
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid #e9edf2;
+      padding: 32px;
+      margin: 0 0 8px;
+    }
+    .hot-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .hot-header .fire {
+      font-size: 1.5rem;
+    }
+    .hot-header h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    .hot-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .hot-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #f8fafc;
+      transition: all 0.2s;
+    }
+    .hot-item:hover { background: #f1f5f9; }
+    .hot-item .rank {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .rank-1 { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+    .rank-2 { background: linear-gradient(135deg, #94a3b8, #64748b); }
+    .rank-3 { background: linear-gradient(135deg, #d97706, #b45309); }
+    .rank-other { background: #e2e8f0; color: #64748b; }
+    .hot-item .info { flex: 1; }
+    .hot-item .info .name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .hot-item .info .desc {
+      font-size: 0.78rem;
+      color: #94a3b8;
+    }
+    .hot-item .hot-link {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ========== Coming Soon ========== */
+    .coming-soon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+    }
+    .coming-item {
+      background: #fff;
+      border: 1px dashed #e2e8f0;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      transition: all 0.2s;
+    }
+    .coming-item:hover {
+      border-color: #cbd5e1;
+      background: #fafbfc;
+    }
+    .coming-item .emoji {
+      font-size: 1.4rem;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    /* ========== Footer ========== */
+    .site-footer {
+      margin-top: auto;
+      background: #fff;
+      border-top: 1px solid #e9edf2;
+      padding: 40px 0 24px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 32px;
+    }
+    .footer-brand .logo-text {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+    .footer-brand p {
+      font-size: 0.85rem;
+      color: #64748b;
+      max-width: 280px;
+      line-height: 1.6;
+    }
+    .footer-col h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 12px;
+    }
+    .footer-col a {
+      display: block;
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 8px;
+      transition: color 0.2s;
+    }
+    .footer-col a:hover { color: #3b82f6; }
+    .footer-bottom {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.82rem;
+      color: #94a3b8;
+    }
+    .footer-bottom a { color: #64748b; }
+    .footer-bottom a:hover { color: #3b82f6; }
+
+    /* ========== No Results ========== */
+    .no-results {
+      display: none;
+      text-align: center;
+      padding: 48px 0;
+      color: #94a3b8;
+    }
+    .no-results .emoji { font-size: 2.5rem; margin-bottom: 12px; }
+    .no-results p { font-size: 0.95rem; }
+
+    /* ========== Responsive ========== */
+    @media (max-width: 900px) {
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 1.8rem; }
+      .hero-sub { font-size: 1rem; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.98);
+        border-bottom: 1px solid #e9edf2;
+        flex-direction: column;
+        padding: 16px 20px;
+        gap: 16px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a.nav-gh { align-self: flex-start; }
+      .menu-toggle { display: flex; }
+      .tool-grid { grid-template-columns: 1fr; }
+      .hot-list { grid-template-columns: 1fr; }
+      .stats-bar { gap: 20px; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+      .hot-section { padding: 20px; }
+    }
+    @media (max-width: 480px) {
+      .hero { padding: 36px 0 28px; }
+      .hero h1 { font-size: 1.5rem; }
+      .container { padding: 0 16px; }
+      .search-wrap input { height: 46px; font-size: 0.9rem; }
+    }
+
+    /* ========== Scrollbar ========== */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
 </head>
 <body>
 
-    <!-- ===== Header ===== -->
-    <header class="header">
-        <div class="header-inner">
-            <a href="/" class="logo">
-                <div class="logo-icon">🐟</div>
-                <span>万能鱼工具箱</span>
-            </a>
-            <nav class="nav-links">
-                <a href="#tools">全部工具</a>
-                <a href="#categories">分类</a>
-                <a href="#">关于</a>
-                <a href="https://github.com/qiafanya/qiafan" target="_blank" class="github-link">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-                    GitHub
-                </a>
-            </nav>
-            <button class="mobile-menu-btn" aria-label="菜单">☰</button>
-        </div>
-    </header>
+<!-- ====== Header ====== -->
+<header class="site-header">
+  <div class="container nav-inner">
+    <a href="/" class="logo">
+      <span class="logo-icon">🐟</span>
+      <span>万能鱼工具箱</span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="/">首页</a>
+      <a href="#categories">全部工具</a>
+      <a href="#">关于</a>
+      <a href="https://github.com/qiafanya/qiafan" class="nav-gh" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8"/></svg>
+        GitHub
+      </a>
+    </nav>
+    <button class="menu-toggle" id="menuToggle" aria-label="菜单">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
 
-    <!-- ===== Hero ===== -->
-    <section class="hero">
-        <div class="hero-badge">✨ 永久免费 · 无需注册 · 即开即用</div>
-        <h1>你的 <span>万能</span> 在线工具包</h1>
-        <p>文本对比、JSON格式化、Base64编解码、二维码生成…… 所有工具免费使用，打开浏览器就能用！</p>
-        <div class="search-wrap">
-            <span class="search-icon">🔍</span>
-            <input type="text" placeholder="搜索你需要的工具..." id="searchInput" oninput="filterTools(this.value)">
-        </div>
-    </section>
-
-    <!-- ===== Stats ===== -->
-    <div class="stats-bar">
-        <div class="stat-item">
-            <div class="num">5</div>
-            <div class="label">在线工具</div>
-        </div>
-        <div class="stat-item">
-            <div class="num">7</div>
-            <div class="label">即将上线</div>
-        </div>
-        <div class="stat-item">
-            <div class="num">∞</div>
-            <div class="label">永久免费</div>
-        </div>
-        <div class="stat-item">
-            <div class="num">🐟</div>
-            <div class="label">万能鱼出品</div>
-        </div>
+<!-- ====== Hero ====== -->
+<section class="hero">
+  <div class="container">
+    <h1>你的<span>万能</span>在线工具包</h1>
+    <p class="hero-sub">文本对比、JSON格式化、Base64编解码、二维码生成……所有工具免费使用</p>
+    <div class="hero-badges">
+      <span>✨ 永久免费</span>
+      <span>🔒 无需注册</span>
+      <span>⚡ 即开即用</span>
+      <span>🧹 纯前端·不上传</span>
     </div>
-
-    <!-- ===== Category Tabs ===== -->
-    <div class="section-title" id="tools">
-        <h2><span class="emoji">🛠️</span> 全部工具</h2>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="搜索工具名称，如 JSON、Base64…" autocomplete="off">
+      <button class="search-clear" id="searchClear" aria-label="清除">✕</button>
     </div>
-    <div class="category-tabs" id="categories">
-        <button class="category-tab active" data-cat="all" onclick="switchCategory('all')">🏠 全部</button>
-        <button class="category-tab" data-cat="text" onclick="switchCategory('text')">📝 文本工具</button>
-        <button class="category-tab" data-cat="encode" onclick="switchCategory('encode')">🔣 编码转换</button>
-        <button class="category-tab" data-cat="image" onclick="switchCategory('image')">🖼️ 图片工具</button>
-        <button class="category-tab" data-cat="security" onclick="switchCategory('security')">🔒 安全工具</button>
-        <button class="category-tab" data-cat="dev" onclick="switchCategory('dev')">💻 开发工具</button>
-        <button class="category-tab" data-cat="calc" onclick="switchCategory('calc')">🧮 计算工具</button>
+  </div>
+</section>
+
+<!-- ====== Stats ====== -->
+<div class="container">
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="num">12</span>
+      <span class="label">在线工具</span>
     </div>
-
-    <!-- ===== Tools Grid ===== -->
-    <div class="tools-grid" id="toolsGrid">
-        <!-- 文本对比 -->
-        <div class="tool-card" data-cat="text" onclick="location.href='/tools/text-diff.html'">
-            <div class="icon-wrap blue">📄</div>
-            <div class="hot-badge">HOT</div>
-            <h3>文本对比 Diff</h3>
-            <p>快速对比两段文本或代码差异，高亮显示增删改</p>
-        </div>
-        <!-- JSON 格式化 -->
-        <div class="tool-card" data-cat="dev" onclick="location.href='/tools/json-formatter.html'">
-            <div class="icon-wrap green">📋</div>
-            <div class="hot-badge">HOT</div>
-            <h3>JSON 格式化</h3>
-            <p>格式化 / 压缩 JSON 数据，支持校验语法错误</p>
-        </div>
-        <!-- Base64 编解码 -->
-        <div class="tool-card" data-cat="encode" onclick="location.href='/tools/base64.html'">
-            <div class="icon-wrap purple">🔐</div>
-            <div class="hot-badge">HOT</div>
-            <h3>Base64 编解码</h3>
-            <p>Base64 编码与解码，支持文本和图片互转</p>
-        </div>
-        <!-- 二维码生成器 -->
-        <div class="tool-card" data-cat="image" onclick="location.href='/tools/qrcode.html'">
-            <div class="icon-wrap yellow">📱</div>
-            <div class="new-badge">NEW</div>
-            <h3>二维码生成器</h3>
-            <p>生成定制化二维码，支持颜色、Logo、尺寸自定义</p>
-        </div>
-        <!-- 密码生成器 -->
-        <div class="tool-card" data-cat="security" onclick="location.href='/tools/password-generator.html'">
-            <div class="icon-wrap red">🔑</div>
-            <h3>密码生成器</h3>
-            <p>生成高强度随机密码，自定义长度与字符类型</p>
-        </div>
+    <div class="stat-item">
+      <span class="num">6</span>
+      <span class="label">工具分类</span>
     </div>
-
-    <!-- ===== Coming Soon ===== -->
-    <div class="section-title">
-        <h2><span class="emoji">🚀</span> 即将上线</h2>
+    <div class="stat-item">
+      <span class="num">∞</span>
+      <span class="label">永久免费</span>
     </div>
-    <div class="coming-soon">
-        <div class="coming-soon-grid">
-            <div class="coming-item"><span class="emoji">🔢</span> URL 编解码</div>
-            <div class="coming-item"><span class="emoji">🔤</span> HTML 实体编解码</div>
-            <div class="coming-item"><span class="emoji">🔠</span> Unicode 转换</div>
-            <div class="coming-item"><span class="emoji">🔏</span> MD5 加密</div>
-            <div class="coming-item"><span class="emoji">📊</span> 字数统计</div>
-            <div class="coming-item"><span class="emoji">🛡️</span> UUID 生成器</div>
-            <div class="coming-item"><span class="emoji">🧮</span> 单位换算</div>
-        </div>
+    <div class="stat-item">
+      <span class="num">🐟</span>
+      <span class="label">万能鱼出品</span>
     </div>
+  </div>
+</div>
 
-    <!-- ===== Footer ===== -->
-    <footer class="footer">
-        <div class="footer-inner">
-            <div class="footer-links">
-                <a href="/">首页</a>
-                <a href="#tools">全部工具</a>
-                <a href="#">关于我们</a>
-                <a href="#">意见反馈</a>
-                <a href="https://github.com/qiafanya/qiafan" target="_blank">GitHub</a>
-            </div>
-            <p>
-                © 2025 <span class="domain">wannengyu.com</span> · 
-                万能鱼工具箱 · 所有工具纯前端运行，你的数据不会上传到服务器
-            </p>
+<!-- ====== Hot Tools ====== -->
+<div class="container section">
+  <div class="hot-section">
+    <div class="hot-header">
+      <span class="fire">🔥</span>
+      <h2>热门工具推荐</h2>
+    </div>
+    <div class="hot-list">
+      <a href="/text-diff.html" class="hot-item">
+        <span class="rank rank-1">1</span>
+        <div class="info">
+          <div class="name">📄 文本对比 Diff</div>
+          <div class="desc">快速对比两段文本差异</div>
         </div>
-    </footer>
+      </a>
+      <a href="/json-formatter.html" class="hot-item">
+        <span class="rank rank-2">2</span>
+        <div class="info">
+          <div class="name">📋 JSON 格式化</div>
+          <div class="desc">格式化/压缩/校验 JSON</div>
+        </div>
+      </a>
+      <a href="/base64.html" class="hot-item">
+        <span class="rank rank-3">3</span>
+        <div class="info">
+          <div class="name">🔐 Base64 编解码</div>
+          <div class="desc">文本与图片 Base64 互转</div>
+        </div>
+      </a>
+      <a href="/qrcode.html" class="hot-item">
+        <span class="rank rank-other">4</span>
+        <div class="info">
+          <div class="name">📱 二维码生成器</div>
+          <div class="desc">自定义颜色/Logo/尺寸</div>
+        </div>
+      </a>
+      <a href="/password-generator.html" class="hot-item">
+        <span class="rank rank-other">5</span>
+        <div class="info">
+          <div class="name">🔑 密码生成器</div>
+          <div class="desc">高强度随机密码生成</div>
+        </div>
+      </a>
+      <a href="/url-encode.html" class="hot-item">
+        <span class="rank rank-other">6</span>
+        <div class="info">
+          <div class="name">🔗 URL 编解码</div>
+          <div class="desc">URL 安全编码与解码</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
 
-    <script>
-        // ===== 工具搜索过滤 =====
-        function filterTools(query) {
-            const cards = document.querySelectorAll('.tool-card');
-            const q = query.toLowerCase().trim();
-            cards.forEach(card => {
-                const title = card.querySelector('h3').textContent.toLowerCase();
-                const desc = card.querySelector('p').textContent.toLowerCase();
-                card.style.display = (!q || title.includes(q) || desc.includes(q)) ? '' : 'none';
-            });
-        }
+<!-- ====== All Tools ====== -->
+<section class="container section" id="categories">
+  <h2 class="section-title">🛠️ 全部工具</h2>
+  <p class="section-desc">按分类浏览，找到你需要的工具</p>
 
-        // ===== 分类切换 =====
-        function switchCategory(cat) {
-            document.querySelectorAll('.category-tab').forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.cat === cat);
-            });
-            document.querySelectorAll('.tool-card').forEach(card => {
-                card.style.display = (cat === 'all' || card.dataset.cat === cat) ? '' : 'none';
-            });
-            // Clear search
-            document.getElementById('searchInput').value = '';
-        }
+  <!-- Category Tabs -->
+  <div class="category-tabs" id="categoryTabs">
+    <span class="category-tab active" data-cat="all">🏠 全部</span>
+    <span class="category-tab" data-cat="text">📝 文本工具</span>
+    <span class="category-tab" data-cat="encode">🔣 编码转换</span>
+    <span class="category-tab" data-cat="image">🖼️ 图片工具</span>
+    <span class="category-tab" data-cat="security">🔒 安全工具</span>
+    <span class="category-tab" data-cat="dev">💻 开发工具</span>
+    <span class="category-tab" data-cat="calc">🧮 计算工具</span>
+  </div>
 
-        // ===== 移动端菜单 =====
-        document.querySelector('.mobile-menu-btn')?.addEventListener('click', function() {
-            const nav = document.querySelector('.nav-links');
-            nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
-            if (nav.style.display === 'flex') {
-                nav.style.flexDirection = 'column';
-                nav.style.position = 'absolute';
-                nav.style.top = '56px';
-                nav.style.left = '0';
-                nav.style.right = '0';
-                nav.style.background = 'white';
-                nav.style.padding = '16px 20px';
-                nav.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
-                nav.style.borderBottom = '1px solid var(--border)';
-            }
-        });
-    </script>
+  <!-- Tool Grid -->
+  <div class="tool-grid" id="toolGrid"></div>
+
+  <!-- No Results -->
+  <div class="no-results" id="noResults">
+    <div class="emoji">🔍</div>
+    <p>没有找到匹配的工具，试试其他关键词吧</p>
+  </div>
+</section>
+
+<!-- ====== Coming Soon ====== -->
+<section class="container section">
+  <h2 class="section-title">🚀 即将上线</h2>
+  <p class="section-desc">更多实用工具正在开发中，敬请期待</p>
+  <div class="coming-soon-grid">
+    <div class="coming-item"><span class="emoji">🔤</span>HTML 实体编解码</div>
+    <div class="coming-item"><span class="emoji">🔠</span>Unicode 转换</div>
+    <div class="coming-item"><span class="emoji">🔏</span>MD5 加密</div>
+    <div class="coming-item"><span class="emoji">📊</span>字数统计</div>
+    <div class="coming-item"><span class="emoji">🛡️</span>UUID 生成器</div>
+    <div class="coming-item"><span class="emoji">🧮</span>单位换算</div>
+    <div class="coming-item"><span class="emoji">📐</span>图片压缩</div>
+    <div class="coming-item"><span class="emoji">🔧</span>正则测试</div>
+    <div class="coming-item"><span class="emoji">⏱️</span>时间戳转换</div>
+    <div class="coming-item"><span class="emoji">🎨</span>代码格式化</div>
+    <div class="coming-item"><span class="emoji">📅</span>日期计算器</div>
+    <div class="coming-item"><span class="emoji">💱</span>汇率换算</div>
+  </div>
+</section>
+
+<!-- ====== Footer ====== -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo-text">🐟 万能鱼工具箱</div>
+        <p>永久免费的在线工具集合。所有工具纯前端运行，你的数据不会上传到服务器，安全可靠，打开即用。</p>
+      </div>
+      <div class="footer-col">
+        <h4>工具分类</h4>
+        <a href="#categories" onclick="switchCategory('text')">📝 文本工具</a>
+        <a href="#categories" onclick="switchCategory('encode')">🔣 编码转换</a>
+        <a href="#categories" onclick="switchCategory('image')">🖼️ 图片工具</a>
+        <a href="#categories" onclick="switchCategory('security')">🔒 安全工具</a>
+        <a href="#categories" onclick="switchCategory('dev')">💻 开发工具</a>
+        <a href="#categories" onclick="switchCategory('calc')">🧮 计算工具</a>
+      </div>
+      <div class="footer-col">
+        <h4>热门工具</h4>
+        <a href="/text-diff.html">文本对比 Diff</a>
+        <a href="/json-formatter.html">JSON 格式化</a>
+        <a href="/base64.html">Base64 编解码</a>
+        <a href="/qrcode.html">二维码生成器</a>
+        <a href="/password-generator.html">密码生成器</a>
+      </div>
+      <div class="footer-col">
+        <h4>关于</h4>
+        <a href="#">关于我们</a>
+        <a href="#">意见反馈</a>
+        <a href="https://github.com/qiafanya/qiafan" target="_blank" rel="noopener">GitHub 开源</a>
+        <a href="https://wannengyu.com" target="_blank" rel="noopener">wannengyu.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 <a href="https://wannengyu.com">wannengyu.com</a> · 万能鱼工具箱</span>
+      <span>
+        <a href="#">隐私声明</a> · 
+        <a href="https://github.com/qiafanya/qiafan" target="_blank" rel="noopener">GitHub</a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<!-- ====== JS ====== -->
+<script>
+  /* ========== Tools Data ========== */
+  const tools = [
+    // 📝 文本工具
+    { name: "文本对比 Diff", desc: "快速对比两段文本或代码差异，高亮显示增删改", cat: "text", icon: "📄", url: "/text-diff.html", tags: ["hot","free"] },
+    { name: "文本去重", desc: "快速去除文本中的重复行，保留唯一内容", cat: "text", icon: "✂️", url: "/text-deduplicate.html", tags: ["free"] },
+    { name: "字数统计", desc: "统计文本字符数、单词数、行数、段落数等", cat: "text", icon: "📊", url: "/word-count.html", tags: ["free"] },
+    { name: "大小写转换", desc: "文本一键转换为大写、小写、首字母大写", cat: "text", icon: "🔡", url: "/case-convert.html", tags: ["free"] },
+    // 🔣 编码转换
+    { name: "Base64 编解码", desc: "Base64 编码与解码，支持文本和图片互转", cat: "encode", icon: "🔐", url: "/base64.html", tags: ["hot","free"] },
+    { name: "URL 编解码", desc: "URL 安全编码与解码，处理特殊字符转义", cat: "encode", icon: "🔗", url: "/url-encode.html", tags: ["hot","free"] },
+    { name: "HTML 实体编解码", desc: "HTML 特殊字符转义与反转义处理", cat: "encode", icon: "🔤", url: "/html-encode.html", tags: ["free"] },
+    { name: "Unicode 转换", desc: "中文与 Unicode 编码互相转换", cat: "encode", icon: "🔠", url: "/unicode.html", tags: ["free"] },
+    // 🖼️ 图片工具
+    { name: "二维码生成器", desc: "生成定制化二维码，支持颜色、Logo、尺寸自定义", cat: "image", icon: "📱", url: "/qrcode.html", tags: ["new","free"] },
+    { name: "图片压缩", desc: "在线压缩 PNG/JPEG 图片，保持清晰度", cat: "image", icon: "📐", url: "/image-compress.html", tags: ["free"] },
+    { name: "图片转 Base64", desc: "将图片文件转换为 Base64 数据 URI", cat: "image", icon: "🔄", url: "/image-to-base64.html", tags: ["free"] },
+    // 🔒 安全工具
+    { name: "密码生成器", desc: "生成高强度随机密码，自定义长度与字符类型", cat: "security", icon: "🔑", url: "/password-generator.html", tags: ["hot","free"] },
+    { name: "随机数生成器", desc: "生成指定范围内的随机数，支持批量生成", cat: "security", icon: "🎲", url: "/random.html", tags: ["free"] },
+    { name: "UUID 生成器", desc: "快速生成 UUID v4 唯一标识符", cat: "security", icon: "🛡️", url: "/uuid.html", tags: ["free"] },
+    // 💻 开发工具
+    { name: "JSON 格式化", desc: "格式化/压缩 JSON 数据，支持语法校验与错误提示", cat: "dev", icon: "📋", url: "/json-formatter.html", tags: ["hot","free"] },
+    { name: "正则表达式测试", desc: "在线测试正则表达式，实时匹配高亮显示", cat: "dev", icon: "🔧", url: "/regex-tester.html", tags: ["free"] },
+    { name: "Unix 时间戳转换", desc: "时间戳与日期时间互相转换，支持多种格式", cat: "dev", icon: "⏱️", url: "/timestamp.html", tags: ["free"] },
+    { name: "代码格式化", desc: "美化缩进 JavaScript / JSON / HTML / CSS 代码", cat: "dev", icon: "🎨", url: "/code-formatter.html", tags: ["free"] },
+    // 🧮 计算工具
+    { name: "科学计算器", desc: "支持科学计算、三角函数、对数等高级运算", cat: "calc", icon: "🧮", url: "/calculator.html", tags: ["free"] },
+    { name: "日期计算器", desc: "计算日期差、加减天数、获取工作日", cat: "calc", icon: "📅", url: "/date-calc.html", tags: ["free"] },
+    { name: "单位换算", desc: "长度、重量、温度、面积等常用单位互换算", cat: "calc", icon: "⚖️", url: "/unit-convert.html", tags: ["free"] },
+    { name: "汇率换算", desc: "实时汇率查询与换算，支持多种货币", cat: "calc", icon: "💱", url: "/forex.html", tags: ["free"] },
+  ];
+
+  /* ========== Render Tools ========== */
+  const grid = document.getElementById('toolGrid');
+  const noRes = document.getElementById('noResults');
+  const searchInput = document.getElementById('searchInput');
+  const searchClear = document.getElementById('searchClear');
+  const tabs = document.querySelectorAll('.category-tab');
+
+  let activeCat = 'all';
+  let searchQuery = '';
+
+  function renderTools() {
+    const q = searchQuery.trim().toLowerCase();
+    const filtered = tools.filter(t => {
+      const matchCat = activeCat === 'all' || t.cat === activeCat;
+      const matchSearch = !q || t.name.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q) || t.tags.some(tag => tag.includes(q));
+      return matchCat && matchSearch;
+    });
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '';
+      noRes.style.display = 'block';
+      return;
+    }
+    noRes.style.display = 'none';
+
+    grid.innerHTML = filtered.map(t => {
+      const tagHtml = t.tags.map(tag => {
+        const cls = tag === 'hot' ? 'tag-hot' : tag === 'new' ? 'tag-new' : 'tag-free';
+        const label = tag === 'hot' ? '🔥 热门' : tag === 'new' ? '✨ 新工具' : '🧹 免费';
+        return `<span class="${cls}">${label}</span>`;
+      }).join('');
+
+      return `
+        <div class="tool-card">
+          <a href="${t.url}" class="card-link"></a>
+          <div class="icon" style="background:${getIconBg(t.cat)}">${t.icon}</div>
+          <h3>${t.name}</h3>
+          <p>${t.desc}</p>
+          <div class="tags">${tagHtml}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function getIconBg(cat) {
+    const map = {
+      'text': '#f0f9ff',
+      'encode': '#f5f3ff',
+      'image': '#fefce8',
+      'security': '#fef2f2',
+      'dev': '#f0fdf4',
+      'calc': '#fff7ed'
+    };
+    return map[cat] || '#f1f5f9';
+  }
+
+  /* ========== Category Tabs ========== */
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      activeCat = tab.dataset.cat;
+      renderTools();
+    });
+  });
+
+  /* ========== Search ========== */
+  searchInput.addEventListener('input', () => {
+    searchQuery = searchInput.value;
+    searchClear.classList.toggle('show', searchQuery.length > 0);
+    renderTools();
+  });
+
+  searchClear.addEventListener('click', () => {
+    searchInput.value = '';
+    searchQuery = '';
+    searchClear.classList.remove('show');
+    renderTools();
+    searchInput.focus();
+  });
+
+  /* ========== Global Switch Category ========== */
+  window.switchCategory = function(cat) {
+    tabs.forEach(t => {
+      t.classList.toggle('active', t.dataset.cat === cat);
+    });
+    activeCat = cat;
+    renderTools();
+    document.getElementById('categories').scrollIntoView({ behavior: 'smooth' });
+  };
+
+  /* ========== Mobile Menu ========== */
+  const menuToggle = document.getElementById('menuToggle');
+  const navLinks = document.getElementById('navLinks');
+
+  menuToggle.addEventListener('click', () => {
+    menuToggle.classList.toggle('active');
+    navLinks.classList.toggle('open');
+  });
+
+  /* ========== Init ========== */
+  renderTools();
+</script>
+
 </body>
 </html>

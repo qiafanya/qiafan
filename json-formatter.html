@@ -172,6 +172,9 @@
       min-height: 400px;
     }
     .panel-body textarea::placeholder { color: #cbd5e1; }
+    .panel-body textarea.has-error {
+      box-shadow: inset 0 0 0 2px #fca5a5;
+    }
     .panel-body pre {
       flex: 1;
       margin: 0;
@@ -187,6 +190,12 @@
     }
     .panel-body pre.error { color: #dc2626; background: #fef2f2; }
     .panel-body pre.empty { color: #cbd5e1; }
+    .panel-body pre .json-key { color: #0d9488; }
+    .panel-body pre .json-string { color: #2563eb; }
+    .panel-body pre .json-number { color: #7c3aed; }
+    .panel-body pre .json-boolean { color: #dc2626; }
+    .panel-body pre .json-null { color: #9333ea; }
+    .panel-body pre .json-bracket { color: #64748b; }
 
     .status-bar {
       display: flex;
@@ -324,14 +333,14 @@
       .status-bar { font-size: 0.72rem; }
       .btn { font-size: 0.78rem; padding: 8px 14px; }
       .action-bar { gap: 6px; }
+      .panel-body textarea { min-height: 240px; }
+      .panel-body pre { min-height: 160px; }
     }
 
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-    .err-highlight { background: #fecaca; border-radius: 2px; padding: 0 2px; }
   </style>
 </head>
 <body>
@@ -370,7 +379,7 @@
 <div class="container">
   <div class="action-bar">
     <button class="btn btn-format" id="btnFormat" title="格式化JSON (Ctrl+Enter)">🎨 格式化</button>
-    <button class="btn btn-compress" id="btnCompress" title="压缩JSON">📦 压缩</button>
+    <button class="btn btn-compress" id="btnCompress" title="压缩JSON (Ctrl+Shift+Enter)">📦 压缩</button>
     <button class="btn btn-copy" id="btnCopy" title="复制输出结果">📋 复制结果</button>
     <button class="btn btn-clear" id="btnClear" title="清空所有内容">🧹 清空</button>
   </div>
@@ -463,32 +472,36 @@
 
 <script>
 (function() {
-  const inputArea   = document.getElementById('inputArea');
-  const outputArea  = document.getElementById('outputArea');
-  const btnFormat   = document.getElementById('btnFormat');
-  const btnCompress = document.getElementById('btnCompress');
-  const btnCopy     = document.getElementById('btnCopy');
-  const btnCopyOut  = document.getElementById('btnCopyOut');
-  const btnClear    = document.getElementById('btnClear');
-  const btnLoadDemo = document.getElementById('btnLoadDemo');
-  const btnFileImport = document.getElementById('btnFileImport');
-  const fileInput   = document.getElementById('fileInput');
-  const dropOverlay = document.getElementById('dropOverlay');
-  const inputBody   = document.getElementById('inputBody');
-  const toast       = document.getElementById('toast');
-  const menuToggle  = document.getElementById('menuToggle');
-  const navLinks    = document.getElementById('navLinks');
+  'use strict';
 
-  const statChars  = document.getElementById('statChars');
-  const statLines  = document.getElementById('statLines');
-  const statValid  = document.getElementById('statValid');
-  const statOutChars = document.getElementById('statOutChars');
-  const statOutLines = document.getElementById('statOutLines');
-  const statDepth  = document.getElementById('statDepth');
+  // ── DOM refs ──────────────────────────────────
+  var inputArea   = document.getElementById('inputArea');
+  var outputArea  = document.getElementById('outputArea');
+  var btnFormat   = document.getElementById('btnFormat');
+  var btnCompress = document.getElementById('btnCompress');
+  var btnCopy     = document.getElementById('btnCopy');
+  var btnCopyOut  = document.getElementById('btnCopyOut');
+  var btnClear    = document.getElementById('btnClear');
+  var btnLoadDemo = document.getElementById('btnLoadDemo');
+  var btnFileImport = document.getElementById('btnFileImport');
+  var fileInput   = document.getElementById('fileInput');
+  var dropOverlay = document.getElementById('dropOverlay');
+  var inputBody   = document.getElementById('inputBody');
+  var toast       = document.getElementById('toast');
+  var menuToggle  = document.getElementById('menuToggle');
+  var navLinks    = document.getElementById('navLinks');
 
-  let lastValidJSON = null;
+  var statChars    = document.getElementById('statChars');
+  var statLines    = document.getElementById('statLines');
+  var statValid    = document.getElementById('statValid');
+  var statOutChars = document.getElementById('statOutChars');
+  var statOutLines = document.getElementById('statOutLines');
+  var statDepth    = document.getElementById('statDepth');
 
-  const DEMO = {
+  var lastValidJSON = null;
+
+  // ── Demo data ─────────────────────────────────
+  var DEMO = {
     name: "万能鱼工具箱",
     version: "1.0.0",
     description: "免费在线工具集合",
@@ -499,7 +512,8 @@
     maintainers: [{ name: "qiafan", role: "developer" }]
   };
 
-  let toastTimer;
+  // ── Toast ─────────────────────────────────────
+  var toastTimer;
   function showToast(msg) {
     toast.textContent = msg;
     toast.classList.add('show');
@@ -507,23 +521,41 @@
     toastTimer = setTimeout(function() { toast.classList.remove('show'); }, 2000);
   }
 
+  // ── Mobile menu ───────────────────────────────
   menuToggle.addEventListener('click', function() {
     menuToggle.classList.toggle('active');
     navLinks.classList.toggle('open');
   });
-  navLinks.querySelectorAll('a').forEach(function(a) {
-    a.addEventListener('click', function() {
+  var navAnchors = navLinks.querySelectorAll('a');
+  for (var i = 0; i < navAnchors.length; i++) {
+    navAnchors[i].addEventListener('click', function() {
       menuToggle.classList.remove('active');
       navLinks.classList.remove('open');
     });
-  });
+  }
+
+  // ── Responsive auto-resize ────────────────────
+  function getMinHeight() {
+    // match CSS media query breakpoints
+    if (window.innerWidth <= 480) return 240;
+    if (window.innerWidth <= 768) return 280;
+    return 400;
+  }
 
   function autoResize() {
     inputArea.style.height = 'auto';
-    inputArea.style.height = Math.max(400, inputArea.scrollHeight) + 'px';
+    var minH = getMinHeight();
+    inputArea.style.height = Math.max(minH, inputArea.scrollHeight) + 'px';
   }
-  inputArea.addEventListener('input', autoResize);
 
+  inputArea.addEventListener('input', autoResize);
+  window.addEventListener('resize', function() {
+    // re-apply responsive height on resize
+    inputArea.style.height = 'auto';
+    inputArea.style.height = Math.max(getMinHeight(), inputArea.scrollHeight) + 'px';
+  });
+
+  // ── JSON parser ───────────────────────────────
   function parseJSON(str) {
     try {
       var obj = JSON.parse(str);
@@ -531,53 +563,86 @@
     } catch(e) {
       var msg = e.message || '';
       var line = null, col = null;
-      var posMatch = msg.match(/position\s+(\d+)/i);
-      var position = posMatch ? parseInt(posMatch[1]) : null;
+      // Chrome/Edge: "Unexpected token ... at position X"
+      // Firefox: "JSON.parse: ... at line X column Y"
+      // Safari: similar to Chrome
+      var posMatch = msg.match(/positions+(\d+)/i);
+      var position = posMatch ? parseInt(posMatch[1], 10) : null;
       if (position !== null) {
         var before = str.substring(0, position);
         line = (before.match(/\n/g) || []).length + 1;
         var lastNewline = before.lastIndexOf('\n');
         col = position - lastNewline;
       } else {
-        var lineMatch = msg.match(/line\s+(\d+)/i);
-        var colMatch = msg.match(/column\s+(\d+)/i);
-        if (lineMatch) line = parseInt(lineMatch[1]);
-        if (colMatch) col = parseInt(colMatch[1]);
+        var lineMatch = msg.match(/lines+(\d+)/i);
+        var colMatch  = msg.match(/columns+(\d+)/i);
+        if (lineMatch) line = parseInt(lineMatch[1], 10);
+        if (colMatch)  col  = parseInt(colMatch[1], 10);
       }
-      var cleanMsg = msg.replace(/^JSON Parse error:\s*/i, '')
-                        .replace(/^SyntaxError:\s*/i, '')
-                        .replace(/^Unexpected\s+/i, 'Unexpected ');
+      // Clean up message
+      var cleanMsg = msg
+        .replace(/^JSONs*Parses*error:s*/i, '')
+        .replace(/^SyntaxError:s*/i, '')
+        .replace(/^Unexpecteds+/i, 'Unexpected ');
       return { ok: false, error: cleanMsg, line: line, col: col, position: position };
     }
   }
 
+  // ── Depth calculator ──────────────────────────
   function getDepth(obj) {
     if (obj === null || typeof obj !== 'object') return 0;
     var max = 0;
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        max = Math.max(max, getDepth(obj[key]));
-      }
+    var keys = Object.keys(obj);
+    for (var i = 0; i < keys.length; i++) {
+      max = Math.max(max, getDepth(obj[keys[i]]));
     }
     return max + 1;
   }
 
+  // ── Syntax highlight for output ───────────────
+  function highlightJSON(obj) {
+    var json = JSON.stringify(obj, null, 2);
+    // Escape HTML first
+    var escaped = json
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    // Apply syntax highlighting
+    return escaped.replace(
+      /("(?:\.|[^"\\])*")\s*:/g,   // keys
+      '<span class="json-key">$1</span>:'
+    ).replace(
+      /:\s*("(?:\.|[^"\\])*")/g,    // string values
+      ': <span class="json-string">$1</span>'
+    ).replace(
+      /:\s*(true|false)/g,              // booleans
+      ': <span class="json-boolean">$1</span>'
+    ).replace(
+      /:\s*(null)/g,                    // null
+      ': <span class="json-null">$1</span>'
+    ).replace(
+      /:\s*(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g, // numbers
+      ': <span class="json-number">$1</span>'
+    );
+  }
+
+  // ── Update input stats ────────────────────────
   function updateInputStats(str) {
     statChars.textContent = str.length;
     statLines.textContent = str ? (str.match(/\n/g) || []).length + 1 : 0;
+
     if (!str.trim()) {
       statValid.innerHTML = '⏳ 等待输入...';
       statValid.className = 'stat';
-      inputArea.style.border = '';
+      inputArea.classList.remove('has-error');
       return;
     }
+
     var parsed = parseJSON(str);
     if (parsed.ok) {
       statValid.innerHTML = '✅ 校验通过';
       statValid.className = 'stat status-ok';
-      inputArea.style.border = '';
-      inputArea.style.outline = '';
-      inputArea.style.boxShadow = '';
+      inputArea.classList.remove('has-error');
       lastValidJSON = parsed.data;
     } else {
       var errText = '❌ ' + parsed.error;
@@ -586,21 +651,21 @@
       if (parsed.line || parsed.col) errText += ')';
       statValid.innerHTML = errText;
       statValid.className = 'stat status-err';
-      inputArea.style.border = '1px solid #fca5a5';
-      inputArea.style.outline = 'none';
-      inputArea.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.08)';
+      inputArea.classList.add('has-error');
     }
   }
 
+  // ── Update output ─────────────────────────────
   function updateOutput(str) {
     if (!str.trim()) {
-      outputArea.textContent = '等待输入 JSON 数据...';
+      outputArea.innerHTML = '等待输入 JSON 数据...';
       outputArea.className = 'empty';
       statOutChars.textContent = '0';
       statOutLines.textContent = '0';
       statDepth.textContent = '-';
       return;
     }
+
     var parsed = parseJSON(str);
     if (!parsed.ok) {
       var errText = '⚠️ JSON 解析错误\n\n' + parsed.error;
@@ -609,27 +674,31 @@
       outputArea.textContent = errText;
       outputArea.className = 'error';
       statOutChars.textContent = str.length;
-      statOutLines.textContent = str ? (str.match(/\n/g) || []).length + 1 : 0;
+      statOutLines.textContent = (str.match(/\n/g) || []).length + 1;
       statDepth.textContent = '-';
       return;
     }
-    var formatted = JSON.stringify(parsed.data, null, 2);
-    outputArea.textContent = formatted;
+
+    // Valid JSON: highlight and display
+    outputArea.innerHTML = highlightJSON(parsed.data);
     outputArea.className = '';
+    var formatted = JSON.stringify(parsed.data, null, 2);
     statOutChars.textContent = formatted.length;
     statOutLines.textContent = (formatted.match(/\n/g) || []).length + 1;
     statDepth.textContent = getDepth(parsed.data);
     lastValidJSON = parsed.data;
   }
 
+  // ── Debounced real-time preview ───────────────
   var debounceTimer;
   inputArea.addEventListener('input', function() {
     var val = inputArea.value;
     updateInputStats(val);
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(function() { updateOutput(val); }, 400);
+    debounceTimer = setTimeout(function() { updateOutput(val); }, 300);
   });
 
+  // ── Format button ─────────────────────────────
   btnFormat.addEventListener('click', function() {
     var val = inputArea.value.trim();
     if (!val) { showToast('⚠️ 请先输入 JSON 数据'); return; }
@@ -639,15 +708,16 @@
       updateOutput(val);
       return;
     }
-    var formatted = JSON.stringify(parsed.data, null, 2);
-    outputArea.textContent = formatted;
+    outputArea.innerHTML = highlightJSON(parsed.data);
     outputArea.className = '';
+    var formatted = JSON.stringify(parsed.data, null, 2);
     statOutChars.textContent = formatted.length;
     statOutLines.textContent = (formatted.match(/\n/g) || []).length + 1;
     statDepth.textContent = getDepth(parsed.data);
     showToast('✅ 格式化完成');
   });
 
+  // ── Compress button ───────────────────────────
   btnCompress.addEventListener('click', function() {
     var val = inputArea.value.trim();
     if (!val) { showToast('⚠️ 请先输入 JSON 数据'); return; }
@@ -663,9 +733,11 @@
     statOutChars.textContent = compressed.length;
     statOutLines.textContent = '1';
     statDepth.textContent = getDepth(parsed.data);
-    showToast('📦 压缩完成（可节省 ' + Math.round((1 - compressed.length / val.length) * 100) + '%）');
+    var saved = Math.round((1 - compressed.length / val.length) * 100);
+    showToast('📦 压缩完成（节省约 ' + saved + '%）');
   });
 
+  // ── Copy output ───────────────────────────────
   function copyOutput() {
     var text = outputArea.textContent;
     if (!text || outputArea.classList.contains('empty')) {
@@ -682,27 +754,35 @@
       fallbackCopy(text);
     }
   }
+
   function fallbackCopy(text) {
     var ta = document.createElement('textarea');
     ta.value = text;
     ta.style.position = 'fixed';
     ta.style.left = '-9999px';
+    ta.style.top = '0';
     document.body.appendChild(ta);
+    ta.focus();
     ta.select();
-    document.execCommand('copy');
+    try {
+      document.execCommand('copy');
+      showToast('📋 已复制到剪贴板');
+    } catch(e) {
+      showToast('⚠️ 复制失败，请手动复制');
+    }
     document.body.removeChild(ta);
-    showToast('📋 已复制到剪贴板');
   }
+
   btnCopy.addEventListener('click', copyOutput);
   btnCopyOut.addEventListener('click', copyOutput);
 
+  // ── Clear button ──────────────────────────────
   btnClear.addEventListener('click', function() {
     inputArea.value = '';
-    outputArea.textContent = '等待输入 JSON 数据...';
+    outputArea.innerHTML = '等待输入 JSON 数据...';
     outputArea.className = 'empty';
-    inputArea.style.border = '';
-    inputArea.style.outline = '';
-    inputArea.style.boxShadow = '';
+    inputArea.classList.remove('has-error');
+
     statChars.textContent = '0';
     statLines.textContent = '0';
     statValid.innerHTML = '⏳ 等待输入...';
@@ -715,6 +795,7 @@
     showToast('🧹 已清空');
   });
 
+  // ── Load demo ─────────────────────────────────
   btnLoadDemo.addEventListener('click', function() {
     inputArea.value = JSON.stringify(DEMO, null, 2);
     updateInputStats(inputArea.value);
@@ -723,7 +804,9 @@
     showToast('📥 示例数据已加载');
   });
 
+  // ── File import ───────────────────────────────
   btnFileImport.addEventListener('click', function() { fileInput.click(); });
+
   fileInput.addEventListener('change', function(e) {
     var file = e.target.files[0];
     if (!file) return;
@@ -735,10 +818,14 @@
       autoResize();
       showToast('📂 文件已导入: ' + file.name);
     };
+    reader.onerror = function() {
+      showToast('⚠️ 文件读取失败');
+    };
     reader.readAsText(file);
     fileInput.value = '';
   });
 
+  // ── Drag & drop ───────────────────────────────
   inputBody.addEventListener('dragover', function(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -755,10 +842,6 @@
     dropOverlay.classList.remove('active');
     var file = e.dataTransfer.files[0];
     if (!file) return;
-    if (!file.name.endsWith('.json') && file.type !== 'application/json') {
-      showToast('⚠️ 请拖入 .json 文件');
-      return;
-    }
     var reader = new FileReader();
     reader.onload = function(ev) {
       inputArea.value = ev.target.result;
@@ -767,20 +850,27 @@
       autoResize();
       showToast('📂 文件已导入: ' + file.name);
     };
+    reader.onerror = function() {
+      showToast('⚠️ 文件读取失败');
+    };
     reader.readAsText(file);
   });
 
+  // ── Keyboard shortcuts ────────────────────────
   document.addEventListener('keydown', function(e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    // Ctrl+Enter → Format
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       btnFormat.click();
     }
+    // Ctrl+Shift+Enter → Compress
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'Enter') {
       e.preventDefault();
       btnCompress.click();
     }
   });
 
+  // ── Init ──────────────────────────────────────
   autoResize();
 })();
 </script>

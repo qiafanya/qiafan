@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>万能宇宙 · GitHub 掌上掌控中心 (wannengyu.space)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+    .custom-scroll::-webkit-scrollbar { width: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.3); border-radius: 9999px; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- 顶部 Header -->
+  <header class="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+    <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shadow-lg shadow-purple-500/20">
+          <i class="fa-solid fa-space-shuttle text-base"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-sm leading-tight tracking-wide bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+            wannengyu.space
+          </h1>
+          <p class="text-[10px] text-purple-400 font-mono" id="userInfoText">未连接 GitHub Key</p>
+        </div>
+      </div>
+      <button onclick="openTokenModal()" class="px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 text-xs text-purple-300 font-medium transition flex items-center gap-1.5 shadow-md">
+        <i class="fa-solid fa-key text-xs text-amber-400"></i><span id="keyBtnText">连接 Key</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="max-w-4xl mx-auto px-4 py-5 flex-1 w-full space-y-5">
+
+    <!-- 未绑定 Key 的引导提示框 -->
+    <div id="noTokenAlert" class="bg-gradient-to-br from-slate-900 via-purple-950/40 to-slate-900 border border-purple-500/30 rounded-2xl p-6 text-center space-y-4 shadow-2xl">
+      <div class="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mx-auto text-2xl shadow-inner">
+        <i class="fa-solid fa-mobile-screen-button"></i>
+      </div>
+      <div class="space-y-1">
+        <h3 class="font-bold text-base text-white">欢迎来到万能宇宙 · GitHub 掌上掌控中心</h3>
+        <p class="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
+          输入您的 GitHub Personal Access Token (Key)，即可使用手机随时随地掌控 GitHub 仓库、新建项目、开启网页与修改代码。
+        </p>
+      </div>
+      <div class="pt-2">
+        <button onclick="openTokenModal()" class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-600/30 transition transform active:scale-95">
+          <i class="fa-solid fa-plug mr-1.5"></i>填写 GitHub Access Token
+        </button>
+      </div>
+      <p class="text-[11px] text-slate-500">🔒 密钥仅存于您手机本地 LocalStorage，零中转服务器，绝对安全</p>
+    </div>
+
+    <!-- 已连接后的掌控控制面板 -->
+    <div id="mainDashboard" class="hidden space-y-4">
+      
+      <!-- 搜索与新建快捷栏 -->
+      <div class="flex items-center gap-2">
+        <div class="relative flex-1">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+          <input type="text" id="repoSearchInput" oninput="filterRepos()" placeholder="搜仓库名称..." 
+            class="w-full pl-8 pr-3 py-2 text-xs bg-slate-900 border border-slate-800 rounded-xl focus:outline-none focus:border-purple-500">
+        </div>
+        <button onclick="openCreateRepoModal()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl transition flex items-center gap-1 shadow-lg shadow-emerald-600/20">
+          <i class="fa-solid fa-plus"></i>新建仓库
+        </button>
+      </div>
+
+      <!-- 仓库列表 -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-layer-group text-purple-400"></i>我的 GitHub 仓库 (<span id="repoCount">0</span>)
+          </h2>
+          <button onclick="loadUserRepos()" class="text-xs text-purple-400 hover:underline flex items-center gap-1">
+            <i class="fa-solid fa-rotate-right text-[10px]"></i>刷新
+          </button>
+        </div>
+
+        <div id="reposGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- 模态框 1：Token 输入 -->
+  <div id="tokenModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+          <i class="fa-solid fa-key text-amber-400"></i>连接 GitHub Access Token
+        </h3>
+        <button onclick="closeTokenModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">Personal Access Token (PAT)：</label>
+          <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx" 
+            class="w-full px-3 py-2 font-mono bg-slate-950 border border-slate-700 rounded-xl focus:outline-none focus:border-purple-500">
+        </div>
+        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-[11px] text-slate-400 space-y-1">
+          <p class="font-semibold text-slate-300"><i class="fa-solid fa-circle-info mr-1 text-purple-400"></i>如何获取 Token？</p>
+          <p>GitHub -> Settings -> Developer Settings -> Personal Access Tokens -> 勾选 <code class="text-purple-400 font-mono">repo</code> 生成即可。</p>
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button onclick="saveToken()" class="flex-1 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs rounded-xl shadow-lg transition">验证并保存到手机</button>
+        <button onclick="clearToken()" class="px-4 py-2.5 bg-rose-950/60 text-rose-400 border border-rose-900/60 hover:bg-rose-900/80 font-semibold text-xs rounded-xl transition">清除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模态框 2：新建仓库 -->
+  <div id="createRepoModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+          <i class="fa-solid fa-folder-plus text-emerald-400"></i>新建 GitHub 仓库
+        </h3>
+        <button onclick="closeCreateRepoModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">仓库名称 <span class="text-rose-400">*</span>：</label>
+          <input type="text" id="newRepoName" placeholder="如: my-app" 
+            class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl focus:outline-none focus:border-purple-500 font-mono">
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">仓库简述：</label>
+          <input type="text" id="newRepoDesc" placeholder="简要描述..." 
+            class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl focus:outline-none focus:border-purple-500">
+        </div>
+        <div class="flex items-center gap-4 pt-1">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="repoVis" value="public" checked> 公开 (Public)
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="repoVis" value="private"> 私有 (Private)
+          </label>
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button onclick="submitCreateRepo()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl shadow-lg transition">确认创建</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模态框 3：仓库详情管理 -->
+  <div id="repoDetailModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl max-h-[90vh] rounded-2xl p-5 shadow-2xl flex flex-col space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 id="detailRepoTitle" class="font-bold text-sm text-slate-100 font-mono flex items-center gap-2"></h3>
+          <p id="detailRepoDesc" class="text-[11px] text-slate-400 mt-0.5"></p>
+        </div>
+        <button onclick="closeRepoDetailModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="flex flex-wrap gap-2 text-xs">
+        <button onclick="enablePagesForCurrentRepo()" class="px-3 py-1.5 bg-purple-600/20 text-purple-300 border border-purple-500/30 rounded-lg hover:bg-purple-600/30 transition">
+          <i class="fa-solid fa-globe mr-1"></i>开启 Pages
+        </button>
+        <button onclick="loadRepoFiles('/')" class="px-3 py-1.5 bg-slate-800 text-slate-200 rounded-lg hover:bg-slate-700 transition">
+          <i class="fa-solid fa-folder-tree mr-1"></i>查看文件
+        </button>
+        <button onclick="deleteCurrentRepo()" class="px-3 py-1.5 bg-rose-950/50 text-rose-400 border border-rose-900/50 rounded-lg hover:bg-rose-900/80 transition ml-auto">
+          <i class="fa-solid fa-trash mr-1"></i>删除仓库
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto custom-scroll bg-slate-950 rounded-xl p-3 border border-slate-800/80 space-y-2" id="repoFilesContainer"></div>
+    </div>
+  </div>
+
+  <script>
+    let userToken = localStorage.getItem('gh_pat_token') || '';
+    let currentRepos = [];
+    let activeRepoName = '';
+    let currentUserInfo = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (userToken) verifyAndInitToken(userToken);
+    });
+
+    function openTokenModal() {
+      document.getElementById('tokenInput').value = userToken;
+      document.getElementById('tokenModal').classList.remove('hidden');
+    }
+    function closeTokenModal() { document.getElementById('tokenModal').classList.add('hidden'); }
+    function openCreateRepoModal() { document.getElementById('createRepoModal').classList.remove('hidden'); }
+    function closeCreateRepoModal() { document.getElementById('createRepoModal').classList.add('hidden'); }
+    function closeRepoDetailModal() { document.getElementById('repoDetailModal').classList.add('hidden'); }
+
+    function saveToken() {
+      const val = document.getElementById('tokenInput').value.trim();
+      if (!val) return alert('请输入有效的 Token');
+      verifyAndInitToken(val, true);
+    }
+
+    function clearToken() {
+      localStorage.removeItem('gh_pat_token');
+      userToken = '';
+      document.getElementById('userInfoText').innerText = '未连接 Key';
+      document.getElementById('keyBtnText').innerText = '连接 Key';
+      document.getElementById('noTokenAlert').classList.remove('hidden');
+      document.getElementById('mainDashboard').classList.add('hidden');
+      closeTokenModal();
+    }
+
+    async function verifyAndInitToken(token, isManual = false) {
+      try {
+        const res = await fetch('https://api.github.com/user', {
+          headers: { 'Authorization': `token ${token}`, 'User-Agent': 'Wannengyu-Hub' }
+        });
+        if (!res.ok) throw new Error('Token 无效');
+        currentUserInfo = await res.json();
+
+        userToken = token;
+        localStorage.setItem('gh_pat_token', token);
+
+        document.getElementById('userInfoText').innerText = `@${currentUserInfo.login}`;
+        document.getElementById('keyBtnText').innerText = `@${currentUserInfo.login}`;
+        document.getElementById('noTokenAlert').classList.add('hidden');
+        document.getElementById('mainDashboard').classList.remove('hidden');
+
+        if (isManual) closeTokenModal();
+        loadUserRepos();
+      } catch (err) {
+        alert('Token 验证失败: ' + err.message);
+      }
+    }
+
+    async function loadUserRepos() {
+      if (!userToken) return;
+      const grid = document.getElementById('reposGrid');
+      grid.innerHTML = '<div class="col-span-full py-8 text-center text-xs text-slate-500">正在加载您的仓库...</div>';
+
+      try {
+        const res = await fetch('https://api.github.com/user/repos?sort=updated&per_page=100', {
+          headers: { 'Authorization': `token ${userToken}`, 'User-Agent': 'Wannengyu-Hub' }
+        });
+        currentRepos = await res.json();
+        renderRepos(currentRepos);
+      } catch (e) {
+        grid.innerHTML = `<div class="col-span-full py-8 text-center text-xs text-rose-400">加载失败: ${e.message}</div>`;
+      }
+    }
+
+    function renderRepos(list) {
+      const grid = document.getElementById('reposGrid');
+      document.getElementById('repoCount').innerText = list.length;
+      grid.innerHTML = '';
+
+      if (list.length === 0) {
+        grid.innerHTML = '<div class="col-span-full py-8 text-center text-xs text-slate-500">暂无仓库</div>';
+        return;
+      }
+
+      list.forEach(r => {
+        const card = document.createElement('div');
+        card.className = 'bg-slate-900 border border-slate-800 rounded-xl p-4 hover:border-slate-700 cursor-pointer flex flex-col justify-between space-y-3 transition';
+        card.onclick = () => openRepoDetail(r);
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-mono text-xs font-bold text-purple-300 truncate max-w-[180px]">${r.name}</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full ${r.private ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}">
+                ${r.private ? '私有' : '公开'}
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">${r.description || '暂无描述'}</p>
+          </div>
+          <div class="flex items-center justify-between text-[10px] text-slate-500 pt-2 border-t border-slate-800/60">
+            <span>⭐ ${r.stargazers_count} · 🍴 ${r.forks_count}</span>
+            <span>更新于 ${new Date(r.updated_at).toLocaleDateString()}</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function filterRepos() {
+      const kw = document.getElementById('repoSearchInput').value.trim().toLowerCase();
+      const filtered = currentRepos.filter(r => r.name.toLowerCase().includes(kw) || (r.description && r.description.toLowerCase().includes(kw)));
+      renderRepos(filtered);
+    }
+
+    async function submitCreateRepo() {
+      const name = document.getElementById('newRepoName').value.trim();
+      const desc = document.getElementById('newRepoDesc').value.trim();
+      const isPrivate = document.querySelector('input[name="repoVis"]:checked').value === 'private';
+
+      if (!name) return alert('请输入仓库名称');
+
+      try {
+        const res = await fetch('https://api.github.com/user/repos', {
+          method: 'POST',
+          headers: { 'Authorization': `token ${userToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: name, description: desc, private: isPrivate, auto_init: true })
+        });
+        if (!res.ok) throw new Error('创建失败');
+        alert('仓库创建成功！');
+        closeCreateRepoModal();
+        loadUserRepos();
+      } catch (err) {
+        alert('创建报错: ' + err.message);
+      }
+    }
+
+    function openRepoDetail(repo) {
+      activeRepoName = repo.name;
+      document.getElementById('detailRepoTitle').innerHTML = `<i class="fa-solid fa-folder text-amber-400"></i>${repo.full_name}`;
+      document.getElementById('detailRepoDesc').innerText = repo.description || '无详细描述';
+      document.getElementById('repoDetailModal').classList.remove('hidden');
+      loadRepoFiles('/');
+    }
+
+    async function loadRepoFiles(path = '/') {
+      const container = document.getElementById('repoFilesContainer');
+      container.innerHTML = '<div class="py-6 text-center text-xs text-slate-500">获取文件列表中...</div>';
+
+      try {
+        const res = await fetch(`https://api.github.com/repos/${currentUserInfo.login}/${activeRepoName}/contents${path}`, {
+          headers: { 'Authorization': `token ${userToken}`, 'User-Agent': 'Wannengyu-Hub' }
+        });
+        const files = await res.json();
+        container.innerHTML = '';
+
+        if (!Array.isArray(files)) {
+          container.innerHTML = '<div class="py-4 text-xs text-slate-400">暂无文件</div>';
+          return;
+        }
+
+        files.forEach(f => {
+          const div = document.createElement('div');
+          div.className = 'flex items-center justify-between p-2 rounded-lg bg-slate-900/60 hover:bg-slate-900 border border-slate-800/50 text-xs font-mono';
+          div.innerHTML = `
+            <div class="flex items-center gap-2 truncate">
+              <i class="${f.type==='dir'?'fa-solid fa-folder text-amber-400':'fa-regular fa-file-code text-purple-400'}"></i>
+              <span class="text-slate-200 truncate">${f.name}</span>
+            </div>
+            <span class="text-[10px] text-slate-500">${(f.size/1024).toFixed(1)} KB</span>
+          `;
+          container.appendChild(div);
+        });
+      } catch (e) {
+        container.innerHTML = `<div class="py-4 text-xs text-rose-400">读取失败: ${e.message}</div>`;
+      }
+    }
+
+    async function enablePagesForCurrentRepo() {
+      if (!confirm(`确定为仓库 ${activeRepoName} 开启 GitHub Pages 网站服务？`)) return;
+      try {
+        const res = await fetch(`https://api.github.com/repos/${currentUserInfo.login}/${activeRepoName}/pages`, {
+          method: 'POST',
+          headers: { 'Authorization': `token ${userToken}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
+          body: JSON.stringify({ source: { branch: 'main', path: '/' } })
+        });
+        alert('GitHub Pages 开启成功！网页地址: https://' + currentUserInfo.login + '.github.io/' + activeRepoName + '/');
+      } catch (e) {
+        alert('开启失败: ' + e.message);
+      }
+    }
+
+    async function deleteCurrentRepo() {
+      if (!confirm(`确定要彻底删除仓库 [${activeRepoName}] 吗？`)) return;
+      try {
+        const res = await fetch(`https://api.github.com/repos/${currentUserInfo.login}/${activeRepoName}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `token ${userToken}` }
+        });
+        alert('仓库已成功删除');
+        closeRepoDetailModal();
+        loadUserRepos();
+      } catch (e) {
+        alert('删除失败: ' + e.message);
+      }
+    }
+  </script>
+</body>
+</html>
